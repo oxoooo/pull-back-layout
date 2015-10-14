@@ -1,11 +1,8 @@
 Pull Back Layout
 ==========
 
-[![](https://img.shields.io/github/tag/oxoooo/pull-back-layout.svg?style=flat-square)](https://jitpack.io/#oxoooo/pull-back-layout)
+[![](https://img.shields.io/github/tag/oxoooo/pull-back-layout.svg?style=flat-square&label=jitpack.io)](https://jitpack.io/#oxoooo/pull-back-layout)
 [![](https://img.shields.io/github/license/oxoooo/pull-back-layout.svg?style=flat-square)](LICENSE)
-[![](https://img.shields.io/github/watchers/oxoooo/pull-back-layout.svg?style=flat-square)](https://github.com/oxoooo/pull-back-layout/watchers)
-[![](https://img.shields.io/github/stars/oxoooo/pull-back-layout.svg?style=flat-square)](https://github.com/oxoooo/pull-back-layout/stargazers)
-[![](https://img.shields.io/github/forks/oxoooo/pull-back-layout.svg?style=flat-square)](https://github.com/oxoooo/pull-back-layoutt/network)
 [![](https://img.shields.io/github/issues/oxoooo/pull-back-layout.svg?style=flat-square)](https://github.com/oxoooo/pull-back-layout/issues)
 
 Pull down to finish an Activity.
