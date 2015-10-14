@@ -10,6 +10,8 @@ Pull Back Layout
 
 Pull down to finish an Activity.
 
+![](screenshot.gif)
+
 ## Download
 
 ```gradle
