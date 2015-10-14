@@ -28,7 +28,22 @@ dependencies {
 
 You may refer to one of our apps that already using this library: [mr-mantou-android](https://github.com/oxoooo/mr-mantou-android/blob/abc2b660b3c0e6ed5c6fe5fb962e7df19ab9d8a4/app/src/main/java/ooo/oxo/mr/ViewerActivity.java#L170)
 
-1. Wraps `ooo.oxo.library.widget.PullBackLayout` around your `ImageView` or `ViewPager`:
+1. Make your Activity translucent by adding these two lines to your theme:
+
+  ```xml
+  <style name="AppTheme" ...>
+      <!-- ... -->
+
+      <item name="android:windowBackground">@android:color/transparent</item>
+      <item name="android:windowIsTranslucent">true</item>
+
+      <!-- also translucent system ui -- suggested but not required -->
+      <item name="android:windowTranslucentStatus">true</item>
+      <item name="android:windowTranslucentNavigation">true</item>
+  </style>
+  ```
+
+2. Wraps `ooo.oxo.library.widget.PullBackLayout` around your `ImageView` or `ViewPager`:
 
   ```xml
   <ooo.oxo.library.widget.PullBackLayout
@@ -44,7 +59,7 @@ You may refer to one of our apps that already using this library: [mr-mantou-and
   </ooo.oxo.library.widget.PullBackLayout>
   ```
 
-2. Set a callback:
+3. Set a callback:
 
   ```java
   public class ViewerActivity extends AppCompatActivity implements PullBackLayout.Callback {
