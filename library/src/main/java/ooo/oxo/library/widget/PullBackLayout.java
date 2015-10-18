@@ -25,6 +25,7 @@
 package ooo.oxo.library.widget;
 
 import android.content.Context;
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
@@ -35,11 +36,31 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.FrameLayout;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
 public class PullBackLayout extends FrameLayout {
+
+    /**
+     * Flag indicated pulling up is allowed
+     *
+     * @see #setDirection(int)
+     */
+    public static final int DIRECTION_UP = 1;
+
+    /**
+     * Flag indicated pulling down is allowed
+     *
+     * @see #setDirection(int)
+     */
+    public static final int DIRECTION_DOWN = 1 << 1;
 
     private final ViewDragHelper dragger;
 
     private final int minimumFlingVelocity;
+
+    @Direction
+    private int direction = DIRECTION_UP | DIRECTION_DOWN;
 
     @Nullable
     private Callback callback;
@@ -56,6 +77,25 @@ public class PullBackLayout extends FrameLayout {
         super(context, attrs, defStyleAttr);
         dragger = ViewDragHelper.create(this, 1f / 8f, new ViewDragCallback());
         minimumFlingVelocity = ViewConfiguration.get(context).getScaledMinimumFlingVelocity();
+    }
+
+    /**
+     * @return Allowed pulling direction
+     */
+    @Direction
+    public int getDirection() {
+        return direction;
+    }
+
+    /**
+     * Sets pulling directions allowed
+     *
+     * @param direction Directions allowed
+     * @see #DIRECTION_UP
+     * @see #DIRECTION_DOWN
+     */
+    public void setDirection(@Direction int direction) {
+        this.direction = direction;
     }
 
     public void setCallback(@Nullable Callback callback) {
@@ -80,15 +120,49 @@ public class PullBackLayout extends FrameLayout {
         }
     }
 
+    private void onPullStart() {
+        if (callback != null) {
+            callback.onPullStart();
+        }
+    }
+
+    private void onPull(@Direction int direction, float progress) {
+        if (callback != null) {
+            callback.onPull(direction, progress);
+        }
+    }
+
+    private void onPullCancel(@Direction int direction) {
+        if (callback != null) {
+            callback.onPullCancel(direction);
+        }
+    }
+
+    private void onPullComplete(@Direction int direction) {
+        if (callback != null) {
+            callback.onPullComplete(direction);
+        }
+    }
+
+    private void reset() {
+        dragger.settleCapturedViewAt(0, 0);
+        invalidate();
+    }
+
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef(value = {DIRECTION_UP, DIRECTION_DOWN}, flag = true)
+    @interface Direction {
+    }
+
     public interface Callback {
 
         void onPullStart();
 
-        void onPull(float progress);
+        void onPull(@Direction int direction, float progress);
 
-        void onPullCancel();
+        void onPullCancel(@Direction int direction);
 
-        void onPullComplete();
+        void onPullComplete(@Direction int direction);
 
     }
 
@@ -106,7 +180,15 @@ public class PullBackLayout extends FrameLayout {
 
         @Override
         public int clampViewPositionVertical(View child, int top, int dy) {
-            return Math.max(0, top);
+            if ((direction & (DIRECTION_UP | DIRECTION_DOWN)) != 0) {
+                return top;
+            } else if ((direction & DIRECTION_UP) != 0) {
+                return Math.min(0, top);
+            } else if ((direction & DIRECTION_DOWN) != 0) {
+                return Math.max(0, top);
+            } else {
+                return 0;
+            }
         }
 
         @Override
@@ -116,37 +198,48 @@ public class PullBackLayout extends FrameLayout {
 
         @Override
         public int getViewVerticalDragRange(View child) {
-            return getHeight();
-        }
-
-        @Override
-        public void onViewCaptured(View capturedChild, int activePointerId) {
-            if (callback != null) {
-                callback.onPullStart();
+            if (direction == 0) {
+                return 0;
+            } else if ((direction & (DIRECTION_UP | DIRECTION_DOWN)) != 0) {
+                return getHeight() * 2;
+            } else {
+                return getHeight();
             }
         }
 
         @Override
+        public void onViewCaptured(View capturedChild, int activePointerId) {
+            onPullStart();
+        }
+
+        @Override
         public void onViewPositionChanged(View changedView, int left, int top, int dx, int dy) {
-            if (callback != null) {
-                callback.onPull((float) top / (float) getHeight());
+            if (top > 0) {
+                onPull(DIRECTION_DOWN, (float) top / (float) getHeight());
+            } else if (top < 0) {
+                onPull(DIRECTION_UP, (float) -top / (float) getHeight());
             }
         }
 
         @Override
         public void onViewReleased(View releasedChild, float xvel, float yvel) {
-            int slop = yvel > minimumFlingVelocity ? getHeight() / 6 : getHeight() / 3;
-            if (releasedChild.getTop() > slop) {
-                if (callback != null) {
-                    callback.onPullComplete();
-                }
-            } else {
-                if (callback != null) {
-                    callback.onPullCancel();
-                }
+            int top = releasedChild.getTop();
+            int slop = Math.abs(yvel) > minimumFlingVelocity ? getHeight() / 6 : getHeight() / 3;
 
-                dragger.settleCapturedViewAt(0, 0);
-                invalidate();
+            if (top > 0) {
+                if (top > slop) {
+                    onPullComplete(DIRECTION_DOWN);
+                } else {
+                    onPullCancel(DIRECTION_DOWN);
+                    reset();
+                }
+            } else if (top < 0) {
+                if (top < -slop) {
+                    onPullComplete(DIRECTION_UP);
+                } else {
+                    onPullCancel(DIRECTION_UP);
+                    reset();
+                }
             }
         }
 
