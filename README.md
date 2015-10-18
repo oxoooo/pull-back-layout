@@ -20,7 +20,7 @@ repositories {
 dependencies {
     // ... support library ...
     // ...
-    compile 'com.github.oxoooo:pull-back-layout:1.0.0'
+    compile 'com.github.oxoooo:pull-back-layout:1.0.1'
 }
 ```
 
