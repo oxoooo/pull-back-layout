@@ -33,11 +33,11 @@ android {
 
         targetSdkVersion 23
 
-        versionCode 10000
-        versionName "1.0.0"
+        versionCode 10001
+        versionName "1.0.1"
     }
 }
 
 dependencies {
-    provided 'com.android.support:support-v4:23.0.1'
+    provided 'com.android.support:support-v4:23.1.0'
 }

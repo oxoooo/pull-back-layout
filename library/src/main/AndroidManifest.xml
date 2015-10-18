@@ -22,4 +22,4 @@
   ~ SOFTWARE.
   -->
 
-<manifest package="ooo.oxo.library.widget" />
+<manifest package="ooo.oxo.library.widget.pullbacklayout" />
